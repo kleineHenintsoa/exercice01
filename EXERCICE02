@@ -1,0 +1,66 @@
+def minimisation_karnaugh(table):
+    """Minimiser une fonction logique donnée par la méthode de Karnaugh"""
+    n = len(table[0]) - 1  # Nombre de variables
+    variables = [f"x{i}" for i in range(n)]  # Noms des variables
+
+    # Création de la table de Karnaugh
+    karnaugh = {}
+    for i, ligne in enumerate(table):
+        minterm = tuple(ligne[:-1])
+        sortie = ligne[-1]
+        karnaugh[minterm] = sortie
+
+    # Groupement des mintermes
+    groupes = {}
+    for minterm, sortie in karnaugh.items():
+        count = minterm.count(1)
+        if count not in groupes:
+            groupes[count] = []
+        groupes[count].append((minterm, sortie))
+
+    # Simplification
+    simplification = []
+    for _, mintermes in groupes.items():
+        for minterm, sortie in mintermes:
+            for autre, _ in mintermes:
+                if voisins(minterm, autre):
+                    mintermes.remove((autre, _))
+        simplification.extend(mintermes)
+
+    # Construction de la fonction minimisée
+    fonction_minimisee = []
+    for minterm, _ in simplification:
+        variables_minterm = []
+        for i, val in enumerate(minterm):
+            if val == 1:
+                variables_minterm.append(variables[i])
+            elif val == 0:
+                variables_minterm.append(f"¬{variables[i]}")
+        fonction_minimisee.append(" & ".join(variables_minterm))
+
+    return " | ".join(fonction_minimisee)
+
+
+def voisins(m1, m2):
+    """Vérifier si deux mintermes sont voisins"""
+    diff = 0
+    for a, b in zip(m1, m2):
+        if a != b:
+            diff += 1
+    return diff == 1
+
+
+def main():
+    n = int(input("Entrez le nombre de variables : "))
+    m = int(input("Entrez le nombre de mintermes dans la table de vérité : "))
+    table = []
+    print("Entrez les mintermes de la table de vérité :")
+    for _ in range(m):
+        minterm = list(map(int, input().split()))
+        table.append(minterm)
+
+    print("La fonction logique minimisée est :", minimisation_karnaugh(table))
+
+
+if __name__ == "__main__":
+    main()
