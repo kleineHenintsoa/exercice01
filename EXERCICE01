@@ -1,0 +1,66 @@
+def table_de_verite(n):
+    """Générer la table de vérité pour une fonction logique avec n variables"""
+    table = []
+    for i in range(2 ** n):
+        ligne = []
+        for j in range(n):
+            ligne.append((i // (2 ** j)) % 2)
+        table.append(ligne)
+    return table
+
+
+def trouver_forme_canonique(table):
+    """Trouver la première forme canonique d'une fonction logique à partir de sa table de vérité"""
+    n = len(table[0]) - 1  # nombre de variables
+    mintermes = []
+    for i, ligne in enumerate(table):
+        if ligne[-1] == 1:
+            mintermes.append(i)
+
+    termes = []
+    for minterme in mintermes:
+        variables = []
+        for j, val in enumerate(table[minterme][:n]):
+            if val == 1:
+                variables.append(f"x{j}")
+            elif val == 0:
+                variables.append(f"¬x{j}")
+        termes.append("&".join(variables))
+
+    termes_simplifies = []
+    for terme in termes:
+        inverse = terme.replace("¬", "")
+        if inverse not in termes_simplifies:
+            termes_simplifies.append(terme)
+
+    return " | ".join(termes_simplifies)
+
+    # Simplification des termes canoniques
+    simplifiees = []
+    for formule in formules:
+        for f in simplifiees:
+            if set(formule.split(" & ")) <= set(f.split(" & ")):
+                break
+        else:
+            simplifiees.append(formule)
+
+    return " | ".join(simplifiees)
+
+
+def afficher_table_de_verite(table):
+    """Afficher la table de vérité"""
+    for ligne in table:
+        print(" | ".join(map(str, ligne)))
+
+
+def main():
+    n = int(input("Entrez le nombre de variables : "))
+    table = table_de_verite(n)
+    print("Table de vérité :")
+    afficher_table_de_verite(table)
+    forme_canonique = trouver_forme_canonique(table)
+    print("La première forme canonique de la fonction logique est :", forme_canonique)
+
+
+if __name__ == "__main__":
+    main()
